@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>توصيف مقررات التاريخ </title>
+  <meta name="description" content="بحث بعرض كامل، تصنيفات بدون خلفية، وترقيم صفحات — مع توحيد نوعية الخط في التصنيفات وأزرار الترقيم لتطابق البوكسات." />
+  <style>
+    :root{
+      --identity-primary:#86754d; 
+      --identity-accent:#4EB3BD; 
+      --text:#0a0a0a; --muted:#667085; --line:#e6e9ef; --bg:#fff;
+      --radius:14px; --shadow:0 6px 18px rgba(16,24,40,.06);
+      --ui-font:"NotoKufiArabic","Tajawal",system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans Arabic",sans-serif;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;background:var(--bg);color:var(--text);font-family:var(--ui-font);line-height:1.8;-webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility; font-feature-settings:"liga" 1,"kern" 1}
+
+    .wrap{max-width:1200px;margin:0 auto;padding:16px}
+
+    .controls{position:sticky;top:0;z-index:50;background:var(--bg);padding:10px 0 16px;border-bottom:1px solid var(--line)}
+    .controls.is-scrolled{box-shadow:0 6px 18px rgba(16,24,40,.06)}
+
+    .search{width:100%;display:flex;align-items:center;gap:0;background:#fff;border:1px solid var(--line);border-radius:999px;overflow:hidden;min-height:52px}
+    .search input{flex:1 1 auto;border:0;outline:0;padding:14px 18px;font-size:1.05rem;font-family:var(--ui-font);letter-spacing:.1px}
+    .search .btn{flex:0 0 auto;border:0;padding:0 22px;background:var(--identity-primary);color:#fff;font-weight:800;cursor:pointer;height:52px;display:inline-flex;align-items:center;font-family:var(--ui-font);letter-spacing:.1px}
+    .search .btn:hover{filter:brightness(.95)}
+
+    .filters-bar{margin-top:10px}
+    .filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-family:var(--ui-font)}
+    .chip{--chip-bd:var(--line);--chip-fg:var(--text);display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border:1px solid var(--chip-bd);border-radius:999px;background:transparent;color:var(--chip-fg);cursor:pointer;font-weight:700;user-select:none;line-height:1;font-family:var(--ui-font);letter-spacing:.1px}
+    .chip[data-active="true"]{border-color:#f0e2c9;color:var(--identity-primary);box-shadow:inset 0 0 0 2px rgba(134,117,77,.12)}
+    .chip:hover{border-color:var(--identity-accent)}
+    .chip:focus{outline:3px solid rgba(78,179,189,.35);outline-offset:2px}
+
+    .grid{display:grid;gap:16px;grid-template-columns:1fr;margin-top:16px}
+    @media(min-width:640px){.grid{grid-template-columns:repeat(2,1fr)}}
+    @media(min-width:1100px){.grid{grid-template-columns:repeat(3,1fr)}}
+
+    .box-wrapper.withShadow{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow);transition:.25s ease;position:relative;display:flex;flex-direction:column;min-height:140px;font-family:var(--ui-font)}
+    .box-wrapper.withShadow:hover{transform:translateY(-3px);border-color:var(--identity-accent);box-shadow:0 10px 26px rgba(0,0,0,.10)}
+    .box-wrapper.withShadow::after{content:"";position:absolute;inset-inline:0;bottom:0;height:.3rem;background:#999;border-bottom-left-radius:var(--radius);border-bottom-right-radius:var(--radius);transition:.25s ease;opacity:.6}
+    .box-wrapper.withShadow:hover::after{background:var(--identity-accent);opacity:1}
+    .box-header h4{margin:0 0 6px;font-size:1.06rem;color:var(--identity-primary);font-family:var(--ui-font);letter-spacing:.1px}
+    .box-header a{color:var(--identity-primary);text-decoration:none;font-family:var(--ui-font)}
+    .box-header a:hover{text-decoration:underline}
+    .box-footer{margin-top:auto;padding-top:10px;border-top:1px dashed #d9dee8;color:#555;font-size:.95rem;display:flex;align-items:center;justify-content:space-between;gap:8px}
+    .details{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .pill{background:#eef8f9;color:#1c4b52;border:1px solid #d3eef0;padding:4px 8px;border-radius:999px;font-size:.8rem;font-weight:700}
+
+    .pagination{display:flex;gap:8px;align-items:center;justify-content:center;margin:22px 0 8px;flex-wrap:wrap;font-family:var(--ui-font)}
+    .page-btn{padding:10px 14px;border:1px solid var(--line);border-radius:10px;background:#fff;cursor:pointer;font-family:var(--ui-font);font-weight:700;letter-spacing:.1px}
+    .page-btn[aria-current="page"]{background:#fff7ea;border-color:#f0e2c9;color:var(--identity-primary);font-weight:800}
+    .page-btn:disabled{opacity:.5;cursor:not-allowed}
+
+    .hidden{display:none!important}
+    .empty{text-align:center;color:var(--muted);padding:40px 0}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="controls">
+      <form class="search" onsubmit="event.preventDefault();applyFilters();">
+        <input id="q" type="search" placeholder="ابحث باسم المقرر…" aria-label="بحث" />
+        <button class="btn" type="submit">بحث</button>
+      </form>
+      <div class="filters-bar">
+        <nav class="filters" aria-label="تصنيفات المقررات">
+          <button class="chip" data-cat="all" data-active="true" onclick="setCategory(event,'all')">الكل</button>
+          <button class="chip" data-cat="methods" onclick="setCategory(event,'methods')">مناهج وبحث</button>
+          <button class="chip" data-cat="islamic" onclick="setCategory(event,'islamic')">تاريخ إسلامي</button>
+          <button class="chip" data-cat="ancient" onclick="setCategory(event,'ancient')">تاريخ قديم</button>
+          <button class="chip" data-cat="modern" onclick="setCategory(event,'modern')">حديث ومعاصر</button>
+          <button class="chip" data-cat="haram" onclick="setCategory(event,'haram')">الحرمين والجزيرة</button>
+        </nav>
+      </div>
+    </section>
+
+    <section class="grid" id="cards"></section>
+
+    <nav class="pagination" role="navigation" aria-label="ترقيم الصفحات">
+      <button class="page-btn" id="prev" onclick="goPage(-1)">« السابق</button>
+      <span id="pages"></span>
+      <button class="page-btn" id="next" onclick="goPage(1)">التالي »</button>
+    </nav>
+
+    <div id="empty" class="empty hidden">لا توجد نتائج مطابقة للبحث/التصنيف.</div>
+  </div>
+
+  <script>
+    (function(){
+      const c = document.querySelector('.controls');
+      const onScroll=()=>c.classList.toggle('is-scrolled',window.scrollY>8);
+      window.addEventListener('scroll',onScroll,{passive:true});
+      onScroll();
+    })();
+
+    const DATA=[
+      {t:"تاريخ وعمارة الحرمين الشريفين", d:"2024/10/23", cat:["haram","islamic"], href:"#"},
+      {t:"قاعة بحث في التاريخ والحضارة", d:"2024/10/23", cat:["methods"], href:"#"},
+      {t:"منهج البحث التاريخي", d:"2024/10/23", cat:["methods"], href:"#"},
+      {t:"المسلمون والمغول", d:"2024/10/23", cat:["islamic","ancient"], href:"#"},
+      {t:"النظم الإسلامية 2", d:"2024/10/23", cat:["islamic"], href:"#"},
+      {t:"تاريخ آسيا الحديث والمعاصر", d:"2024/10/23", cat:["modern"], href:"#"},
+      {t:"تاريخ إفريقيا القديم", d:"2024/10/23", cat:["ancient"], href:"#"},
+      {t:"تاريخ الأنبياء", d:"2024/10/23", cat:["islamic"], href:"#"},
+      {t:"تاريخ الجزيرة العربية القديم", d:"2024/10/23", cat:["haram","ancient"], href:"#"},
+      {t:"تاريخ الدولة الأموية", d:"2024/10/23", cat:["islamic"], href:"#"},
+      {t:"تاريخ الدولتين الأيوبية والمملوكية", d:"2024/10/23", cat:["islamic"], href:"#"},
+      {t:"تاريخ الشرق القديم", d:"2024/10/23", cat:["ancient"], href:"#"}
+    ];
+
+    const PAGE_SIZE=9; let currentPage=1; let currentCat='all';
+    const cardsEl=document.getElementById('cards');
+    const pagesEl=document.getElementById('pages');
+    const emptyEl=document.getElementById('empty');
+
+    function render(list){
+      cardsEl.innerHTML='';
+      list.forEach(item=>{
+        const art=document.createElement('article');
+        art.className='box-wrapper withShadow';
+        art.setAttribute('data-cat',item.cat.join(' '));
+        art.setAttribute('data-title',item.t);
+        art.innerHTML=`
+          <div class="box-header">
+            <h4><a href="${item.href}">${item.t}</a></h4>
+          </div>
+          <div class="box-footer">
+            <div class="details">
+              <span>وقت التعديل: ${item.d}</span>
+              <span class="pill">PDF</span>
+            </div>
+            <a href="${item.href}" aria-label="تحميل توصيف المقرر">تحميل</a>
+          </div>`;
+        cardsEl.appendChild(art);
+      });
+    }
+
+    function paginate(list){
+      const start=(currentPage-1)*PAGE_SIZE; const end=start+PAGE_SIZE;
+      const pageItems=list.slice(start,end);
+      render(pageItems);
+      const totalPages=Math.max(1,Math.ceil(list.length/PAGE_SIZE));
+      pagesEl.innerHTML='';
+      for(let i=1;i<=totalPages;i++){
+        const b=document.createElement('button');
+        b.className='page-btn'; b.textContent=i;
+        if(i===currentPage){ b.setAttribute('aria-current','page'); }
+        b.onclick=()=>{ currentPage=i; paginate(list); window.scrollTo({top:0,behavior:'smooth'}); };
+        pagesEl.appendChild(b);
+      }
+      document.getElementById('prev').disabled=currentPage===1;
+      document.getElementById('next').disabled=currentPage===totalPages;
+    }
+
+    function goPage(delta){ currentPage+=delta; applyFilters(); }
+    function setCategory(e,cat){ currentCat=cat; document.querySelectorAll('.chip').forEach(c=>c.dataset.active='false'); e.currentTarget.dataset.active='true'; currentPage=1; applyFilters(); }
+
+    function applyFilters(){
+      const q=(document.getElementById('q').value||'').trim().toLowerCase();
+      const filtered=DATA.filter(x=>{
+        const byCat=currentCat==='all'||x.cat.includes(currentCat);
+        const byText=q===''||x.t.toLowerCase().includes(q);
+        return byCat&&byText;
+      });
+      emptyEl.classList.toggle('hidden',filtered.length>0);
+      paginate(filtered);
+    }
+
+    applyFilters();
+  </script>
+</body>
+</html>
